@@ -1,30 +1,125 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Stalwart Company Profile</title>
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+  <title>Company Profile</title>
   <style>
-    html, body {
+    /* Reset */
+    * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
-      height: 100%;
-      overflow: hidden;
     }
 
-    iframe {
-      width: 100%;
+    body, html {
       height: 100%;
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Sticky Toolbar */
+    #pdf-toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background-color: #222;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+
+    #pdf-toolbar h1 {
+      font-size: 1.2rem;
+    }
+
+    #pdf-toolbar button {
+      padding: 8px 14px;
+      background-color: #ff6600;
       border: none;
+      border-radius: 4px;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    #pdf-toolbar button:hover {
+      background-color: #e65c00;
+    }
+
+    /* PDF container */
+    #pdf-container {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px 0;
+    }
+
+    canvas {
+      margin: 10px 0;
+      max-width: 90%;
+      height: auto !important;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+      border-radius: 4px;
+      background: #fff;
     }
   </style>
 </head>
 <body>
 
-  <iframe 
-    src="Stalwart.pdf#view=FitH&toolbar=1&navpanes=0&scrollbar=1"
-    allow="fullscreen">
-  </iframe>
+  <div id="pdf-toolbar">
+    <h1>Company Profile</h1>
+    <button id="download-btn">Download PDF</button>
+  </div>
+
+  <div id="pdf-container"></div>
+
+  <!-- PDF.js Library -->
+  <script src="pdf.js/pdf.min.js"></script>
+  <script>
+    const url = 'company-profile.pdf';
+    const container = document.getElementById('pdf-container');
+
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'pdf.js/pdf.worker.min.js';
+
+    // Load PDF
+    pdfjsLib.getDocument(url).promise.then(pdf => {
+      const totalPages = pdf.numPages;
+
+      for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
+        pdf.getPage(pageNum).then(page => {
+          const viewport = page.getViewport({ scale: 1.5 });
+          const canvas = document.createElement('canvas');
+          const context = canvas.getContext('2d');
+          canvas.height = viewport.height;
+          canvas.width = viewport.width;
+
+          page.render({ canvasContext: context, viewport: viewport });
+          container.appendChild(canvas);
+
+          // Make responsive
+          canvas.style.width = '90%';
+          canvas.style.height = 'auto';
+        });
+      }
+    });
+
+    // Download PDF
+    document.getElementById('download-btn').addEventListener('click', () => {
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'company-profile.pdf';
+      link.click();
+    });
+  </script>
 
 </body>
 </html>
