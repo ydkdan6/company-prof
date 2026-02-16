@@ -83,12 +83,12 @@
   <div id="pdf-container"></div>
 
   <!-- PDF.js Library -->
-  <script src="pdf.js/pdf.min.js"></script>
+  <script src="pdf.min.js"></script>
   <script>
-    const url = 'company-profile.pdf';
+    const url = 'Stalwart.pdf';
     const container = document.getElementById('pdf-container');
 
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'pdf.js/pdf.worker.min.js';
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'pdf.worker.min.js';
 
     // Load PDF
     pdfjsLib.getDocument(url).promise.then(pdf => {
